@@ -12,6 +12,7 @@ process.on('uncaughtException', (err) => {
 
 // Configure environment variables
 dotenv.config();
+console.log("MONGODB_URI =", process.env.MONGODB_URI);
 
 // Connect to Database
 connectDB();
