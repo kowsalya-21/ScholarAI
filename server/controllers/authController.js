@@ -47,21 +47,32 @@ export const register = asyncHandler(async (req, res, next) => {
   const salt = await bcrypt.genSalt(12);
   const hashedPassword = await bcrypt.hash(password, salt);
 
+  // Sanitize input values to prevent validation crashes from empty string values in optional enums
+  const cleanPhone = phone === '' ? undefined : phone;
+  const cleanCollege = college === '' ? undefined : college;
+  const cleanCourse = course === '' ? undefined : course;
+  const cleanYear = year === '' ? undefined : year;
+  const cleanCgpa = (cgpa === null || cgpa === '' || isNaN(parseFloat(cgpa))) ? undefined : parseFloat(cgpa);
+  const cleanFamilyIncome = (familyIncome === null || familyIncome === '' || isNaN(parseInt(familyIncome))) ? undefined : parseInt(familyIncome);
+  const cleanCategory = category === '' ? undefined : category;
+  const cleanGender = gender === '' ? undefined : gender;
+  const cleanState = state === '' ? undefined : state;
+
   // 4. Create student user account
   const newUser = await User.create({
     fullName,
     email,
     password: hashedPassword,
-    phone,
-    college,
-    course,
-    year,
-    cgpa,
-    familyIncome,
-    category,
-    gender,
-    state,
-    skills,
+    phone: cleanPhone,
+    college: cleanCollege,
+    course: cleanCourse,
+    year: cleanYear,
+    cgpa: cleanCgpa,
+    familyIncome: cleanFamilyIncome,
+    category: cleanCategory,
+    gender: cleanGender,
+    state: cleanState,
+    skills: Array.isArray(skills) ? skills : [],
     role: 'Student', // Force Student role on registration
   });
 
