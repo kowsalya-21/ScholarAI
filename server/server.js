@@ -26,7 +26,7 @@ const server = app.listen(PORT, () => {
   console.log(` ScholarAI Backend Server Running!`);
   console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(` Port: ${PORT}`);
-  console.log(` Health Check: http://localhost:${PORT}/api/health`);
+  console.log(` Health Check: https://scholarai-backend.onrender.com/api/health`);
   console.log(`============================================`);
 });
 
