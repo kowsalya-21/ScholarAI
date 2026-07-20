@@ -214,10 +214,10 @@ const RegisterPage = () => {
     const normalizedGender = formData.gender === 'Prefer Not to Say' ? 'Prefer not to say' : formData.gender;
 
     const payload = {
-      fullName: formData.fullName,
-      email: formData.email,
+      fullName: formData.fullName.trim(),
+      email: formData.email.trim().toLowerCase(),
       password: formData.password,
-      college: formData.collegeName,
+      college: formData.collegeName.trim(),
       course: formData.course,
       year: formData.academicYear,
       cgpa: parseFloat(formData.cgpa),
@@ -264,12 +264,14 @@ const RegisterPage = () => {
     } catch (error) {
       setIsLoading(false);
       
+      const serverMsg = error.response?.data?.message || error.response?.data?.error || error.message;
+
       if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
         error.response.data.errors.forEach(err => {
           toast.error(err.msg || 'Validation error');
         });
-      } else if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
+      } else if (serverMsg) {
+        toast.error(serverMsg);
       } else {
         toast.error('An error occurred during registration.');
       }
