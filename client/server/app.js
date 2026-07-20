@@ -14,7 +14,6 @@ import scholarshipRouter from './routes/scholarshipRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 
-
 const app = express();
 
 // 1. GLOBAL MIDDLEWARES
@@ -84,11 +83,10 @@ app.use('/api/scholarships', scholarshipRouter);
 app.use('/api/users', userRouter);
 app.use('/api/notifications', notificationRouter);
 
-
 // 3. ERROR HANDLING
 
-// Handle unhandled routes (404)
-app.all('*', (req, res, next) => {
+// Handle unhandled routes (404) (Express 5 compatible)
+app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
