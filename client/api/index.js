@@ -4,19 +4,19 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 
-import AppError from '../../server/utils/appError.js';
-import globalErrorHandler from '../../server/middleware/errorMiddleware.js';
-import healthRouter from '../../server/routes/health.js';
-import authRouter from '../../server/routes/authRoutes.js';
-import scholarshipRouter from '../../server/routes/scholarshipRoutes.js';
-import userRouter from '../../server/routes/userRoutes.js';
-import notificationRouter from '../../server/routes/notificationRoutes.js';
-import connectDB from '../../server/config/db.js';
+import AppError from '../server/utils/appError.js';
+import globalErrorHandler from '../server/middleware/errorMiddleware.js';
+import healthRouter from '../server/routes/health.js';
+import authRouter from '../server/routes/authRoutes.js';
+import scholarshipRouter from '../server/routes/scholarshipRoutes.js';
+import userRouter from '../server/routes/userRoutes.js';
+import notificationRouter from '../server/routes/notificationRoutes.js';
+import connectDB from '../server/config/db.js';
 
 const app = express();
 
 app.use(helmet({
-  contentSecurityPolicy: false, // Disable CSP in serverless handler to prevent blocking
+  contentSecurityPolicy: false,
 }));
 app.use(morgan('combined'));
 
