@@ -15,7 +15,13 @@ import connectDB from '../server/config/db.js';
 
 const app = express();
 
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+
 app.use(morgan('combined'));
 app.use(cors({
   origin: true,
