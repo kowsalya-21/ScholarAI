@@ -10,6 +10,9 @@ const connectDB = async (retryCount = 0) => {
   const retryIntervalMs = 1000;
 
   let mongoURI = process.env.MONGODB_URI || DEFAULT_FALLBACK_URI;
+  if (mongoURI.includes('mongodb+srv://')) {
+    mongoURI = DEFAULT_FALLBACK_URI;
+  }
 
   // Setup connection event listeners only on the first attempt
   if (retryCount === 0) {
@@ -31,7 +34,7 @@ const connectDB = async (retryCount = 0) => {
   }
 
   try {
-    console.log(`Connecting to MongoDB... (Attempt ${retryCount + 1}/${maxRetries})`);
+    console.log(`Connecting to MongoDB Atlas... (Attempt ${retryCount + 1}/${maxRetries})`);
     
     const options = {
       autoIndex: true,
@@ -43,13 +46,6 @@ const connectDB = async (retryCount = 0) => {
     return conn;
   } catch (error) {
     console.error(`MongoDB connection attempt ${retryCount + 1} failed: ${error.message}`);
-    
-    // If SRV DNS lookup failed (querySrv ECONNREFUSED), convert to direct cluster hosts fallback
-    if (mongoURI !== DEFAULT_FALLBACK_URI) {
-      console.log('Attempting direct cluster hosts fallback...');
-      process.env.MONGODB_URI = DEFAULT_FALLBACK_URI;
-      return connectDB(retryCount);
-    }
 
     if (retryCount < maxRetries - 1) {
       console.log(`Retrying connection in ${retryIntervalMs / 1000} seconds...`);
