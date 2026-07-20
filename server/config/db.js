@@ -7,7 +7,7 @@ const connectDB = async (retryCount = 0) => {
   const maxRetries = 5;
   const retryIntervalMs = 5000;
 
-  const mongoURI = process.env.MONGODB_URI;
+  let mongoURI = process.env.MONGODB_URI;
 
   if (!mongoURI) {
     console.error('CRITICAL ERROR: MONGODB_URI is not defined in the environment variables.');
@@ -33,7 +33,8 @@ const connectDB = async (retryCount = 0) => {
     console.log(`Connecting to MongoDB... (Attempt ${retryCount + 1}/${maxRetries})`);
     
     const options = {
-      autoIndex: true, // Build indexes (useful in dev, but can disable in production for performance)
+      autoIndex: true,
+      serverSelectionTimeoutMS: 10000,
     };
 
     const conn = await mongoose.connect(mongoURI, options);
@@ -42,6 +43,14 @@ const connectDB = async (retryCount = 0) => {
   } catch (error) {
     console.error(`MongoDB connection attempt ${retryCount + 1} failed: ${error.message}`);
     
+    // If SRV DNS lookup failed (querySrv ECONNREFUSED), convert to direct cluster hosts fallback
+    if (error.message.includes('querySrv') && mongoURI.startsWith('mongodb+srv://')) {
+      console.log('SRV DNS lookup failed. Attempting direct cluster hosts fallback...');
+      const fallbackURI = 'mongodb://kowsalyanadisetti_db_user:kowsalya@ac-uqubk4r-shard-00-00.buwqrdd.mongodb.net:27017,ac-uqubk4r-shard-00-01.buwqrdd.mongodb.net:27017,ac-uqubk4r-shard-00-02.buwqrdd.mongodb.net:27017/scholarai?ssl=true&authSource=admin';
+      process.env.MONGODB_URI = fallbackURI;
+      return connectDB(retryCount);
+    }
+
     if (retryCount < maxRetries - 1) {
       console.log(`Retrying connection in ${retryIntervalMs / 1000} seconds...`);
       await new Promise((resolve) => setTimeout(resolve, retryIntervalMs));
@@ -54,4 +63,5 @@ const connectDB = async (retryCount = 0) => {
 };
 
 export default connectDB;
+
 
