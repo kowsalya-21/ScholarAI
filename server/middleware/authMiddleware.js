@@ -27,9 +27,8 @@ export const protect = asyncHandler(async (req, res, next) => {
   }
 
   // 2. Verify token signature and expiration
-  // jwt.verify throws JsonWebTokenError / TokenExpiredError on failure,
-  // which is handled globally by our error middleware.
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const secret = process.env.JWT_SECRET || 'development_secret_key_change_me_in_production';
+  const decoded = jwt.verify(token, secret);
 
   // 3. Check if user still exists in the database
   const currentUser = await User.findById(decoded.id);

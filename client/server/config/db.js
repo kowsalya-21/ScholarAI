@@ -1,21 +1,22 @@
 import mongoose from 'mongoose';
 
+const DEFAULT_FALLBACK_URI = 'mongodb://kowsalyanadisetti_db_user:kowsalya@ac-uqubk4r-shard-00-00.buwqrdd.mongodb.net:27017,ac-uqubk4r-shard-00-01.buwqrdd.mongodb.net:27017,ac-uqubk4r-shard-00-02.buwqrdd.mongodb.net:27017/scholarai?ssl=true&authSource=admin';
+
 /**
  * Connect to MongoDB Database with connection retries and robust logging
  */
 const connectDB = async (retryCount = 0) => {
-  const maxRetries = 5;
-  const retryIntervalMs = 5000;
+  const maxRetries = 3;
+  const retryIntervalMs = 1000;
 
-  let mongoURI = process.env.MONGODB_URI;
-
-  if (!mongoURI) {
-    console.error('CRITICAL ERROR: MONGODB_URI is not defined in the environment variables.');
-    process.exit(1);
-  }
+  let mongoURI = process.env.MONGODB_URI || DEFAULT_FALLBACK_URI;
 
   // Setup connection event listeners only on the first attempt
   if (retryCount === 0) {
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
+
     mongoose.connection.on('connected', () => {
       console.log('Mongoose: MongoDB connected successfully to cluster.');
     });
@@ -44,10 +45,9 @@ const connectDB = async (retryCount = 0) => {
     console.error(`MongoDB connection attempt ${retryCount + 1} failed: ${error.message}`);
     
     // If SRV DNS lookup failed (querySrv ECONNREFUSED), convert to direct cluster hosts fallback
-    if (error.message.includes('querySrv') && mongoURI.startsWith('mongodb+srv://')) {
-      console.log('SRV DNS lookup failed. Attempting direct cluster hosts fallback...');
-      const fallbackURI = 'mongodb://kowsalyanadisetti_db_user:kowsalya@ac-uqubk4r-shard-00-00.buwqrdd.mongodb.net:27017,ac-uqubk4r-shard-00-01.buwqrdd.mongodb.net:27017,ac-uqubk4r-shard-00-02.buwqrdd.mongodb.net:27017/scholarai?ssl=true&authSource=admin';
-      process.env.MONGODB_URI = fallbackURI;
+    if (mongoURI !== DEFAULT_FALLBACK_URI) {
+      console.log('Attempting direct cluster hosts fallback...');
+      process.env.MONGODB_URI = DEFAULT_FALLBACK_URI;
       return connectDB(retryCount);
     }
 
@@ -56,12 +56,10 @@ const connectDB = async (retryCount = 0) => {
       await new Promise((resolve) => setTimeout(resolve, retryIntervalMs));
       return connectDB(retryCount + 1);
     } else {
-      console.error('CRITICAL ERROR: Max MongoDB connection retries reached. Shutting down server...');
-      process.exit(1);
+      console.error('ERROR: Max MongoDB connection retries reached.');
+      throw error;
     }
   }
 };
 
 export default connectDB;
-
-

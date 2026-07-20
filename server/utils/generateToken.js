@@ -6,11 +6,7 @@ import jwt from 'jsonwebtoken';
  * @returns {string} Signed JWT Token
  */
 const generateToken = (userId) => {
-  const secret = process.env.JWT_SECRET;
-  
-  if (!secret) {
-    throw new Error('JWT_SECRET is not configured in the environment variables.');
-  }
+  const secret = process.env.JWT_SECRET || 'development_secret_key_change_me_in_production';
 
   return jwt.sign({ id: userId }, secret, {
     expiresIn: '7d',
