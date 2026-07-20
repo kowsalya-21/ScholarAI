@@ -78,11 +78,7 @@ export default (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, req, res);
   } else {
-    let error = { ...err };
-    error.message = err.message;
-    error.name = err.name;
-    error.code = err.code;
-    error.errmsg = err.errmsg;
+    let error = err;
 
     // Handle Mongoose & JWT specific errors
     if (error.name === 'CastError') error = handleCastErrorDB(error);

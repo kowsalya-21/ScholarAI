@@ -44,7 +44,7 @@ export const register = asyncHandler(async (req, res, next) => {
   }
 
   // 3. Hash password using bcryptjs
-  const salt = await bcrypt.genSalt(12);
+  const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
   // Sanitize input values to prevent validation crashes from empty string values in optional enums
@@ -281,7 +281,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   }
 
   // Update password and clear OTP fields
-  const salt = await bcrypt.genSalt(12);
+  const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(newPassword, salt);
   user.resetOTP = undefined;
   user.otpExpiry = undefined;

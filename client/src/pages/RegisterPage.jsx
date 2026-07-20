@@ -264,7 +264,10 @@ const RegisterPage = () => {
     } catch (error) {
       setIsLoading(false);
       
-      const serverMsg = error.response?.data?.message || error.response?.data?.error || error.message;
+      let serverMsg = error.response?.data?.message || error.response?.data?.error || error.message;
+      if (serverMsg === 'Network Error' || !error.response) {
+        serverMsg = 'Connection error. Please try again or check your network.';
+      }
 
       if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
         error.response.data.errors.forEach(err => {

@@ -30,6 +30,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+app.options('*', cors());
+
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
@@ -68,5 +70,10 @@ app.use((req, res, next) => {
 app.use(globalErrorHandler);
 
 export default async function handler(req, res) {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('Pre-connecting DB in handler failed:', err);
+  }
   return app(req, res);
 }

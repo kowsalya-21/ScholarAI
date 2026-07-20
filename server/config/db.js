@@ -19,8 +19,8 @@ const connectDB = async () => {
     }
 
     const options = {
-      autoIndex: true,
-      serverSelectionTimeoutMS: 5000,
+      autoIndex: process.env.NODE_ENV !== 'production',
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
     };
 
