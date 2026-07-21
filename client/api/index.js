@@ -69,11 +69,4 @@ app.use((req, res, next) => {
 
 app.use(globalErrorHandler);
 
-export default async function handler(req, res) {
-  try {
-    await connectDB();
-  } catch (err) {
-    console.error('Pre-connecting DB in handler failed:', err);
-  }
-  return app(req, res);
-}
+export default app;

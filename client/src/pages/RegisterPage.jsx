@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -13,6 +13,7 @@ import educationIllustration from '../assets/education_illustration.png';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const isSubmittingRef = useRef(false);
 
   // Form Fields State
   const [formData, setFormData] = useState({
@@ -158,6 +159,7 @@ const RegisterPage = () => {
   // Main Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLoading || isSubmittingRef.current) return;
 
     // General Validations
     const newErrors = {};
@@ -200,6 +202,7 @@ const RegisterPage = () => {
 
     setErrors({});
     setIsLoading(true);
+    isSubmittingRef.current = true;
 
     const parseIncome = (incomeStr) => {
       if (!incomeStr) return 0;
@@ -278,6 +281,8 @@ const RegisterPage = () => {
       } else {
         toast.error('An error occurred during registration.');
       }
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 

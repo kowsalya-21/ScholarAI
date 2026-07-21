@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import scholarshipIllustration from '../assets/scholarship_illustration.png';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const isSubmittingRef = useRef(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -64,6 +65,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLoading || isSubmittingRef.current) return;
 
     // Perform final check
     const emailErr = !email ? 'Email is required' : !/\S+@\S+\.\S+/.test(email) ? 'Please enter a valid email address' : '';
@@ -79,6 +81,7 @@ const LoginPage = () => {
 
     setErrors({});
     setIsLoading(true);
+    isSubmittingRef.current = true;
 
     try {
       const response = await axios.post('/api/auth/login', {
@@ -106,6 +109,8 @@ const LoginPage = () => {
       const errMsg = error.response?.data?.message || error.response?.data?.errors?.[0]?.msg || 'Invalid credentials. Please try again.';
       setErrors({ form: errMsg });
       toast.error(errMsg);
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
