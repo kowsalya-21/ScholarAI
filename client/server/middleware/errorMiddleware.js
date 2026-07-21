@@ -12,8 +12,16 @@ const handleCastErrorDB = (err) => {
  * Handle Mongoose Duplicate Key Error (11000)
  */
 const handleDuplicateKeyErrorDB = (err) => {
-  // Extract duplicate field value from error message
-  const value = err.errmsg.match(/(["'])(\\?.)*?\1/)?.[0] || 'Unknown value';
+  let value = 'value';
+  if (err.errmsg && typeof err.errmsg === 'string') {
+    const match = err.errmsg.match(/(["'])(\\?.)*?\1/);
+    if (match) value = match[0];
+  } else if (err.keyValue) {
+    value = Object.values(err.keyValue).join(', ');
+  } else if (err.errorResponse && err.errorResponse.errmsg) {
+    const match = err.errorResponse.errmsg.match(/(["'])(\\?.)*?\1/);
+    if (match) value = match[0];
+  }
   const message = `Duplicate field value: ${value}. Please use another value!`;
   return new AppError(message, 400);
 };
