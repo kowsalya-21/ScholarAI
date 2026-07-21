@@ -5,7 +5,8 @@ import './index.css'
 import App from './App.jsx'
 
 // Set global base URL for Axios API requests
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || '';
+const envApiUrl = import.meta.env.VITE_API_URL || '';
+axios.defaults.baseURL = envApiUrl.includes('onrender.com') ? '' : envApiUrl;
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
